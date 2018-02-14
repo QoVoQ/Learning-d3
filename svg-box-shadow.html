@@ -1,0 +1,57 @@
+<!--
+  -- --------------------------------------------------------
+  -- @file svg-box.html
+  -- @author zhongxian_liang <zhongxian_liang@kingdee.com>
+  -- @date 2018-02-14 16:04:30
+  -- @last_modified_by zhongxian_liang <zhongxian_liang@kingdee.com>
+  -- @last_modified_date 2018-02-14 17:13:38
+  -- @copyright (c) 2018 @yfe/d3Demo
+  -- --------------------------------------------------------
+ -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <style>
+      .circle {
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          background: black;
+          box-shadow: 0 0 12px 1px red;
+      }
+
+      .scale {
+          transform: scale(0)
+      }
+
+      .width {
+          width: 0;
+          height: 0;
+      }
+  </style>
+</head>
+<body>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1100 400" version="1.1">
+  <desc>Filter example</desc>
+    <filter id = "i1" width = "150%" height = "150%">
+        <feOffset result = "offOut" in = "SourceGraphic" dx = "0" dy = "0"/>
+        <feGaussianBlur result = "blurOut" in = "offOut" stdDeviation = "10"/>
+        <feBlend in = "SourceGraphic" in2 = "blurOut" mode = "normal"/>
+    </filter>
+  <g stroke-width="5" filter="url(#i1)">
+    <rect x="10%" y="10%" width="20%" height="20%" stroke="blue" fill="wheat"/>
+    <rect x="40%" y="10%" width="20%" height="20%" stroke="green" fill="tomato"/>
+    <rect x="10%" y="40%" width="20%" height="20%" stroke="red" fill="forestgreen"/>
+    <rect x="40%" y="40%" width="20%" height="20%" stroke="yellow" fill="grey"/>
+    <circle cx="10%" cy="10%" r="10%" fill="red"></circle>
+  </g>
+</svg>
+<div class="circle scale"></div>
+<div class="circle width"></div>
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta name="description" content="Arc Transition Demo">
+    <title>Arc Transition Demo</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  </head>
+  <body>
+    <script>
+      var width = 500;
+      var height = 400;
+      var color = d3.scaleOrdinal(d3.schemeCategory10);
+
+      var svgContainer = d3.select("body")
+        .append("svg")
+          .attr("width", width)
+          .attr("height", height)
+          .style("border", "1px solid");
+
+    // Sample data points to draw a line
+    // Each data point has an x and y coordinate value
+    var data = [32, 57, 112, 293];
+
+    var rScale = d3.scaleLinear().domain(d3.extent(data)).range([10, 50])
+
+    var circles =   svgContainer.selectAll('circle')
+      .data(data)
+      .enter()
+      .append('circle')
+      .attr('cy', 200)
+      .attr('cx', function(d, i) { return i*50 + 30; })
+      .attr('r', function(d) { return rScale(d); })
+      .style('fill', 'red');
+
+     function logEnd() {
+       console.log(123)
+     }
+      let i = 0;
+      let isAni = false;
+
+    // Create a path element and set its d attribute value using the line generator created above
+    function draw() {
+      if (arguments[1] !== 3) { return; }
+      circles
+      .transition()
+      .attr('cy', 100)
+      .duration(1000)
+       .transition()
+      .attr('cy', 200)
+      .duration(1000)
+      .on('end', draw)
+    }
+
+      draw(3,3)
+
+    </script>
+  </body>
+</html>

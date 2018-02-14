@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta name="description" content="Arc Transition Demo">
+    <title>Arc Transition Demo</title>
+    <style>
+      body {
+        position: relative;
+        min-height: 100vh;
+        background-color: black;
+        overflow: hidden;
+      }
+
+      .circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background-color: #22F2D0;
+      box-shadow: 0 0 12px 1px #22F2D0;
+      pointer-events: none;
+
+      }
+
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  </head>
+  <body>
+
+    <script>
+      var width = window.innerWidth;
+      var height = window.innerHeight;
+      var xCenter = width / 2;
+      var yCenter = height / 2;
+      var timeLimit = 2000;
+      var rPath = Math.sqrt(xCenter * xCenter + yCenter * yCenter) + 100;
+      var color = d3.scaleOrdinal(d3.schemeCategory10);
+      var circlesNum = 100;
+
+      function getRandom() {
+        return +Math.random().toFixed(2);
+      }
+
+      function rExpansionScaleCustom(t) {
+        if (t < 0.2) {
+          return 0.1
+        }
+        if (t < 0.5) {
+          return 0.5
+        }
+        return 1;
+      }
+
+      var container = d3.select('body')
+          .style("border", "1px solid");
+
+    // Sample data points to draw a line
+    // Each data point has an x and y coordinate value
+    var circles = [];
+
+var rExpansionScale = d3.scaleLinear().domain([0, 1]).range([1, 30])
+var delayScale = d3.scaleLinear().domain([0, 1]).range([100, 5000])
+
+// timePerIteration = delayTime + animationTime
+var timePerIterationScale = d3.scaleLinear().domain([0, 1]).range([800, 2000])
+var rEndScale = d3.scaleLinear().domain([0, 1]).range([10, 20])
+var rExpansionRateScale = d3.scalePow().exponent(3).domain([0, 1]).range([0, 1])
+
+    for(let i = 0; i < circlesNum; i++) {
+      const circle = {
+        rStart: 0,
+        rEnd: rEndScale(getRandom()),
+        rExpansion: rExpansionScale(getRandom()),
+        color: '#22F2D0',
+        angle: 2 * Math.PI * getRandom(),
+        delay: delayScale(getRandom()),
+        limit: timeLimit,
+        xTransform: 0,
+        yTransform: 0,
+        rCurrent: 0
+      };
+
+      circles.push(circle);
+    }
+
+
+
+    var circlesSvg = container.selectAll('div')
+      .data(circles)
+      .enter()
+      .append('div')
+      .classed('circle', true)
+      // .style('width', function(d) { return `${d.rEnd}px`; })
+      // .style('height', function(d) { return `${d.rEnd}px`; });
+
+    function tickFn(elapsed) {
+      circles.forEach(item => {
+        const timePerIteration = item.limit + item.delay;
+        const currentTimeline = elapsed % timePerIteration;
+        const animationTime = currentTimeline - item.delay;
+
+        if (animationTime < 0) {
+          item.rCurrent = 0;
+          return;
+        }
+
+        const AnimationProgress = animationTime / item.limit;
+        item.xTransform = rPath * Math.sin(item.angle) * AnimationProgress;
+        item.yTransform = rPath * Math.cos(item.angle) * AnimationProgress;
+        item.rCurrent = AnimationProgress;
+      });
+
+      // circlesSvg.style(
+      //   'transform',
+      //   function(d, i) {
+      //     return `translate3d(-50%, -50%, 0)
+      //     translate(${circles[i].xTransform}px ,${circles[i].yTransform}px)
+      //     scale(${circles[i].rCurrent})`;
+      //   });
+      const rFn = function(d) {
+          return `${d.rCurrent * d.rEnd}px`;
+        }
+      circlesSvg
+      .style(
+        'transform',
+        function(d, i) {
+          return `translate3d(-50%, -50%, 0)
+          translate(${circles[i].xTransform}px ,${circles[i].yTransform}px)`;
+        })
+      .style('width', rFn)
+      .style('height', rFn);
+    }
+
+    d3.timer(tickFn);
+
+
+    </script>
+  </body>
+</html>

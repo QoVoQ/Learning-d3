@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+  <head>
+<meta name="description" content="Arc Transition Demo">
+    <title>Arc Transition Demo</title>
+    <style>
+      body {
+        background-color: black;
+      }
+
+          svg {
+        pointer-events: none;
+      }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+
+  </head>
+  <body>
+    <svg>
+          <filter id = "i1" width = "150%" height = "150%">
+        <feOffset result = "offOut" in = "SourceGraphic" dx = "0" dy = "0"/>
+        <feGaussianBlur result = "blurOut" in = "offOut" stdDeviation = "10"/>
+        <feBlend in = "SourceGraphic" in2 = "blurOut" mode = "normal"/>
+    </filter>
+    <g id="svg-group" filter="url(#i1)"></g>
+    </svg>
+    <script>
+      var width = window.innerWidth;
+      var height = window.innerHeight;
+      var xCenter = width / 2;
+      var yCenter = height / 2;
+      var timeLimit = 2000;
+      var rPath = Math.sqrt(xCenter * xCenter + yCenter * yCenter) + 100;
+      var color = d3.scaleOrdinal(d3.schemeCategory10);
+      var circlesNum = 100;
+
+      function getRandom() {
+        return +Math.random().toFixed(2);
+      }
+
+      var svgContainer = d3.select("svg")
+          .attr("width", width)
+          .attr("height", height)
+          .style("border", "1px solid");
+
+    // Sample data points to draw a line
+    // Each data point has an x and y coordinate value
+    var circles = [];
+
+var rExpansionScale = d3.scaleLinear().domain([0, 1]).range([1, 30])
+var delayScale = d3.scaleLinear().domain([0, 1]).range([100, 5000])
+
+// timePerIteration = delayTime + animationTime
+var timePerIterationScale = d3.scaleLinear().domain([0, 1]).range([800, 2000])
+var rEndScale = d3.scaleLinear().domain([0, 1]).range([20, 30])
+
+    for(let i = 0; i < circlesNum; i++) {
+      const circle = {
+        rStart: 0,
+        rEnd: rEndScale(getRandom()),
+        rExpansion: rExpansionScale(getRandom()),
+        color: '#22F2D0',
+        angle: 2 * Math.PI * getRandom(),
+        delay: delayScale(getRandom()),
+        limit: timePerIterationScale(getRandom()),
+        xTransform: 0,
+        yTransform: 0,
+        rCurrent: 0
+      };
+
+      circles.push(circle);
+    }
+
+
+
+    var circlesSvg = svgContainer.select('g').selectAll('circle')
+      .data(circles)
+      .enter()
+      .append('circle')
+      .attr('cy', yCenter)
+      .attr('cx', xCenter)
+      .attr('r', function(d) { return d.rStart; })
+      .classed('circle', true)
+      .style('fill',  function(d) { return d.color; });
+
+    function tickFn(elapsed) {
+      circles.forEach(item => {
+        const timePerIteration = item.limit + item.delay;
+        const currentTimeline = elapsed % timePerIteration;
+        const animationTime = currentTimeline - item.delay;
+
+        if (animationTime < 0) {
+          return;
+        }
+
+        const AnimationProgress = animationTime / item.limit;
+        item.xTransform = rPath * Math.sin(item.angle) * AnimationProgress;
+        item.yTransform = rPath * Math.cos(item.angle) * AnimationProgress;
+        item.rCurrent = item.rEnd * AnimationProgress;
+      });
+
+      circlesSvg.attr(
+        'transform',
+        function(d, i) {
+          return `translate(${circles[i].xTransform},${circles[i].yTransform})`;
+        })
+        .attr('r',function(d) { return d.rCurrent; })
+    }
+
+    d3.timer(tickFn);
+
+
+    </script>
+  </body>
+</html>
